@@ -26,6 +26,7 @@ func run(pass *analysis.Pass) (any, error) {
 
 	nodeFilter := []ast.Node{
 		(*ast.GenDecl)(nil),
+		(*ast.SelectorExpr)(nil),
 	}
 
 	inspect.Preorder(nodeFilter, func(n ast.Node) {
@@ -33,17 +34,26 @@ func run(pass *analysis.Pass) (any, error) {
 		case *ast.GenDecl:
 			// ["fmt","strconv",...]
 			for _, spec := range n.Specs {
+				// spec を *ast.ImportSpecにキャストする
+				// 参考 : https://golang.hateblo.jp/entry/golang-interface-type-assertion
 				s, _ := spec.(*ast.ImportSpec)
+
+				// s.Path.Valueは"hoge"のような形で文字列が入っているので、
+				// ""を文字列から削除する
+				// 参考　: https://tenntenn.dev/ja/posts/quote/
 				path, _ := strconv.Unquote(s.Path.Value)
+				
 				if path == "go.uber.org/multierr" {
 					pass.Reportf(s.Pos(), "hogehoge")
 				}
 			}
-
-			// case *ast.Ident:
-			// 	if n.Name == "gopher" {
-			// 		pass.Reportf(n.Pos(), "identifier is gopher")
-			// 	}
+		case *ast.SelectorExpr:
+			i := n.X.(*ast.Ident)
+			if i.Name == "multierr"{
+				if n.Sel.Name == "Errors" {
+					pass.Reportf(i.Pos(), "multierr found")
+				}
+			}
 		}
 	})
 
