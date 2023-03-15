@@ -8,7 +8,7 @@ import (
 	"golang.org/x/tools/go/ast/inspector"
 )
 
-const doc = "multierrfinder is ..."
+const doc = "multierrfinder finds multierr"
 
 // Analyzer is ...
 var Analyzer = &analysis.Analyzer{
