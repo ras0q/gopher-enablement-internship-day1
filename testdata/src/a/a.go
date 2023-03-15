@@ -1,9 +1,11 @@
 package a
 
 import (
-	"go.uber.org/multierr"
+	"fmt"
+
+	"go.uber.org/multierr" // want "hogehoge"
 )
 
 func f() {
-	multierr.Errors() // want "error found"
+	multierr.Errors(fmt.Errorf("hoge"))
 }
