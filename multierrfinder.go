@@ -24,12 +24,9 @@ var Analyzer = &analysis.Analyzer{
 func run(pass *analysis.Pass) (any, error) {
 	inspect := pass.ResultOf[inspect.Analyzer].(*inspector.Inspector)
 
-	nodeFilter := []ast.Node{
-		(*ast.GenDecl)(nil),
-		(*ast.SelectorExpr)(nil),
-	}
-
-	inspect.Preorder(nodeFilter, func(n ast.Node) {
+	// まずimportだけを見てmultierrが使われていることを確認する
+	multierrIsUsed := false
+	inspect.Preorder([]ast.Node{(*ast.GenDecl)(nil)}, func(n ast.Node) {
 		switch n := n.(type) {
 		case *ast.GenDecl:
 			// ["fmt","strconv",...]
@@ -45,8 +42,19 @@ func run(pass *analysis.Pass) (any, error) {
 				
 				if path == "go.uber.org/multierr" {
 					pass.Reportf(s.Pos(), "hogehoge")
+					multierrIsUsed = true
 				}
 			}
+		}
+	})
+
+	if !multierrIsUsed {
+		return nil, nil
+	}
+
+	// 次にコード内でmultierr.Errors(err)が使われていることを確認する
+	inspect.Preorder([]ast.Node{(*ast.SelectorExpr)(nil)}, func(n ast.Node) {
+		switch n := n.(type) {
 		case *ast.SelectorExpr:
 			i := n.X.(*ast.Ident)
 			if i.Name == "multierr"{

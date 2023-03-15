@@ -7,5 +7,5 @@ import (
 )
 
 func f() {
-	multierr.Errors(fmt.Errorf("hoge")) // want "multierr found!"
+	multierr.Errors(fmt.Errorf("hoge")) // want "multierr found"
 }
