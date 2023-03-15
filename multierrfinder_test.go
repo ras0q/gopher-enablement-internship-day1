@@ -11,5 +11,15 @@ import (
 // TestAnalyzer is a test for Analyzer.
 func TestAnalyzer(t *testing.T) {
 	testdata := testutil.WithModules(t, analysistest.TestData(), nil)
-	analysistest.Run(t, testdata, multierrfinder.Analyzer, "a")
+	t.Run("a", func(t *testing.T) {
+		analysistest.Run(t, testdata, multierrfinder.Analyzer, "a")
+	})
+
+	t.Run("b", func(t *testing.T) {
+		analysistest.Run(t, testdata, multierrfinder.Analyzer, "b")
+	})
+
+	t.Run("rename", func(t *testing.T) {
+		analysistest.Run(t, testdata, multierrfinder.Analyzer, "rename")
+	})
 }

@@ -3,7 +3,7 @@ package a
 import (
 	"fmt"
 
-	"go.uber.org/multierr" // want "hogehoge"
+	"go.uber.org/multierr"
 )
 
 func f() {
